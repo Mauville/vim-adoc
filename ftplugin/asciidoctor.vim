@@ -9,46 +9,19 @@ if exists("b:did_ftplugin")
 endif
 let b:did_ftplugin = 1
 
-let undo_opts = "setl cms< com< fo< flp< inex< efm< cfu< fde< fdm<"
-let undo_cmds = "| delcommand Asciidoctor2PDF"
-            \.. "| delcommand Asciidoctor2HTML"
-            \.. "| delcommand Asciidoctor2DOCX"
-            \.. "| delcommand AsciidoctorOpenRAW"
-            \.. "| delcommand AsciidoctorOpenPDF"
-            \.. "| delcommand AsciidoctorOpenHTML"
-            \.. "| delcommand AsciidoctorOpenDOCX"
-            \.. "| delcommand AsciidoctorPasteImage"
-let undo_maps = "| execute 'nunmap <buffer> ]]'"
-            \.. "| execute 'nunmap <buffer> [['"
-            \.. "| execute 'xunmap <buffer> ]]'"
-            \.. "| execute 'xunmap <buffer> [['"
-            \.. "| execute 'ounmap <buffer> ih'"
-            \.. "| execute 'ounmap <buffer> ah'"
-            \.. "| execute 'xunmap <buffer> ih'"
-            \.. "| execute 'xunmap <buffer> ah'"
-            \.. "| execute 'ounmap <buffer> il'"
-            \.. "| execute 'ounmap <buffer> al'"
-            \.. "| execute 'xunmap <buffer> il'"
-            \.. "| execute 'xunmap <buffer> al'"
-            \.. "| execute 'nunmap <buffer> gx'"
-            \.. "| execute 'nunmap <buffer> gf'"
-            \.. "| execute 'nunmap <buffer> <Plug>(AsciidoctorFold)'"
-            \.. "| execute 'nunmap <buffer> <Plug>(AsciidoctorSectionPromote)'"
-            \.. "| execute 'nunmap <buffer> <Plug>(AsciidoctorSectionDemote)'"
-let undo_vars = "| unlet! b:commentary_startofline"
 
 if exists('b:undo_ftplugin')
-    let b:undo_ftplugin .= "|" .. undo_opts .. undo_cmds .. undo_maps .. undo_vars
+    let b:undo_ftplugin .= "|setl cms< com< fo< flp< inex< efm< cfu<"
 else
-    let b:undo_ftplugin = undo_opts .. undo_cmds .. undo_maps .. undo_vars
+    let b:undo_ftplugin = "setl cms< com< fo< flp< inex< efm< cfu<"
 endif
 
 
 " see https://github.com/asciidoctor/asciidoctor-pdf/issues/1273
 setlocal errorformat=asciidoctor:\ ERROR:\ %f:\ line\ %l:\ %m
 
-" gf to open include::file.ext[] and link:file.ext[] files
-setlocal includeexpr=substitute(v:fname,'\\(link:\\\|include::\\)\\(.\\{-}\\)\\[.*','\\2','g')
+" gf to open include files
+setlocal includeexpr=substitute(v:fname,'include::\\(.\\{-}\\)\\[.*','\\1','g')
 setlocal comments=
 setlocal commentstring=//\ %s
 " vim-commentary plugin setup
@@ -90,10 +63,10 @@ exe 'command! -buffer Asciidoctor2PDF :compiler asciidoctor2pdf | '   . s:make
 exe 'command! -buffer Asciidoctor2HTML :compiler asciidoctor2html | ' . s:make
 exe 'command! -buffer Asciidoctor2DOCX :compiler asciidoctor2docx | ' . s:make
 
-command! -buffer AsciidoctorOpenRAW  call asciidoctor#open_file(s:get_fname())
-command! -buffer AsciidoctorOpenPDF  call asciidoctor#open_file(s:get_fname(".pdf"))
-command! -buffer AsciidoctorOpenHTML call asciidoctor#open_file(s:get_fname(".html"))
-command! -buffer AsciidoctorOpenDOCX call asciidoctor#open_file(s:get_fname(".docx"))
+command! -buffer AsciidoctorOpenRAW  call s:open_file(s:get_fname())
+command! -buffer AsciidoctorOpenPDF  call s:open_file(s:get_fname(".pdf"))
+command! -buffer AsciidoctorOpenHTML call s:open_file(s:get_fname(".html"))
+command! -buffer AsciidoctorOpenDOCX call s:open_file(s:get_fname(".docx"))
 
 command! -buffer AsciidoctorPasteImage :call asciidoctor#pasteImage()
 
@@ -108,44 +81,18 @@ xmap     <buffer><expr>   ]] "\<esc>".v:count1.']]m>gv'
 xmap     <buffer><expr>   [[ "\<esc>".v:count1.'[[m>gv'
 
 "" header textobject
-onoremap <silent><buffer>ih :<C-u>call asciidoctor#header_textobj(v:true)<CR>
-onoremap <silent><buffer>ah :<C-u>call asciidoctor#header_textobj(v:false)<CR>
-xnoremap <silent><buffer>ih :<C-u>call asciidoctor#header_textobj(v:true)<CR>
-xnoremap <silent><buffer>ah :<C-u>call asciidoctor#header_textobj(v:false)<CR>
+onoremap <silent>ih :<C-u>call asciidoctor#header_textobj(v:true)<CR>
+onoremap <silent>ah :<C-u>call asciidoctor#header_textobj(v:false)<CR>
+xnoremap <silent>ih :<C-u>call asciidoctor#header_textobj(v:true)<CR>
+xnoremap <silent>ah :<C-u>call asciidoctor#header_textobj(v:false)<CR>
 
 "" delimited bLock textobject
-onoremap <silent><buffer>il :<C-u>call asciidoctor#delimited_block_textobj(v:true)<CR>
-onoremap <silent><buffer>al :<C-u>call asciidoctor#delimited_block_textobj(v:false)<CR>
-xnoremap <silent><buffer>il :<C-u>call asciidoctor#delimited_block_textobj(v:true)<CR>
-xnoremap <silent><buffer>al :<C-u>call asciidoctor#delimited_block_textobj(v:false)<CR>
+onoremap <silent>il :<C-u>call asciidoctor#delimited_block_textobj(v:true)<CR>
+onoremap <silent>al :<C-u>call asciidoctor#delimited_block_textobj(v:false)<CR>
+xnoremap <silent>il :<C-u>call asciidoctor#delimited_block_textobj(v:true)<CR>
+xnoremap <silent>al :<C-u>call asciidoctor#delimited_block_textobj(v:false)<CR>
 
-nnoremap <silent><buffer> gx :<c-u>call asciidoctor#open_url()<CR>
-nnoremap <silent><buffer> gf :<c-u>call asciidoctor#open_url("edit")<CR>
-
-"" Useful with
-""  let g:asciidoctor_folding = 1
-""  let g:asciidoctor_foldnested = 0
-""  let g:asciidoctor_foldtitle_as_h1 = 1
-"" Fold up to count foldlevel in a special way:
-""     * no count is provided, toggle current fold;
-""     * count is n, open folds of up to foldlevel n.
-func! s:asciidoctor_fold(count) abort
-    if !get(g:, 'asciidoctor_folding', 0)
-        return
-    endif
-    if a:count == 0
-        normal! za
-    else
-        let &foldlevel = a:count
-    endif
-endfunc
-
-"" fold up to v:count foldlevel in a special way
-nnoremap <silent><buffer> <Plug>(AsciidoctorFold) :<C-u>call <sid>asciidoctor_fold(v:count)<CR>
-
-"" promote/demote sections
-nnoremap <silent><buffer> <Plug>(AsciidoctorSectionPromote) :<C-u>call asciidoctor#promote_section()<CR>
-nnoremap <silent><buffer> <Plug>(AsciidoctorSectionDemote) :<C-u>call asciidoctor#demote_section()<CR>
+nnoremap <silent><buffer> gx :<c-u>call <sid>open_url()<CR>
 
 
 
@@ -177,15 +124,8 @@ if has("folding") && get(g:, 'asciidoctor_folding', 0)
            return ">1"
         endif
 
-        let nested = get(g:, "asciidoctor_foldnested", v:true)
-
         " Regular headers
         let depth = match(line, '\(^=\+\)\@<=\( .*$\)\@=')
-
-        " Do not fold nested regular headers
-        if depth > 1 && !nested
-            let depth = 1
-        endif
 
         " Setext style headings
         if depth < 0
@@ -193,35 +133,34 @@ if has("folding") && get(g:, 'asciidoctor_folding', 0)
             let nextline = getline(v:lnum + 1)
 
             if (line =~ '^.\+$') && (nextline =~ '^=\+$') && (prevline =~ '^\s*$')
-                let depth = nested ? 2 : 1
+                let depth = 2
             endif
 
             if (line =~ '^.\+$') && (nextline =~ '^-\+$') && (prevline =~ '^\s*$')
-                let depth = nested ? 3 : 1
+                let depth = 3
             endif
 
             if (line =~ '^.\+$') && (nextline =~ '^\~\+$') && (prevline =~ '^\s*$')
-                let depth = nested ? 4 : 1
+                let depth = 4
             endif
 
             if (line =~ '^.\+$') && (nextline =~ '^^\+$') && (prevline =~ '^\s*$')
-                let depth = nested ? 5 : 1
+                let depth = 5
             endif
 
             if (line =~ '^.\+$') && (nextline =~ '^+\+$') && (prevline =~ '^\s*$')
-                let depth = nested ? 5 : 1
+                let depth = 5
             endif
         endif
 
 
         if depth > 0
-            " fold all sections under title
-            if depth > 1 && get(g:, "asciidoctor_foldtitle_as_h1", v:true)
+            if depth > 1
                 let depth -= 1
             endif
             " check syntax, it should be asciidoctorTitle or asciidoctorH
             let syncode = synstack(v:lnum, 1)
-            if len(syncode) > 0 && synIDattr(syncode[0], 'name') =~ 'asciidoctor\%(H[1-6]\)\|Title\|SetextHeader'
+            if len(syncode) > 0 && synIDattr(syncode[0], 'name') =~ 'asciidoctor\%(H[1-6]\)\|Title'
                 return ">" . depth
             endif
         endif
@@ -246,6 +185,7 @@ if has("folding") && get(g:, 'asciidoctor_folding', 0)
 
     setlocal foldexpr=AsciidoctorFold()
     setlocal foldmethod=expr
+    let b:undo_ftplugin .= " foldexpr< foldmethod<"
     let s:asciidoctor_fold_options = get(g:, 'asciidoctor_fold_options', 0)
 endif
 
@@ -297,9 +237,87 @@ func! s:get_fname(...)
 endfunc
 
 
+"" Return Windows path from WSL
+func! s:wsl_to_windows_path(path) abort
+    if !exists("$WSLENV")
+        return a:path
+    endif
+
+    if !executable('wslpath')
+        return a:path
+    endif
+
+    let res = systemlist('wslpath -w ' . a:path)
+    if !empty(res)
+        return res[0]
+    else
+        return a:path
+    endif
+endfunc
+
+
+func! s:open_file(filename)
+    if filereadable(a:filename)
+        if exists("$WSLENV")
+            exe g:asciidoctor_opener . ' '
+                        \ . shellescape(s:wsl_to_windows_path(a:filename))
+        else
+            exe g:asciidoctor_opener . ' ' . shellescape(a:filename)
+        endif
+    else
+        echom a:filename . " doesn't exist!"
+    endif
+endfunc
+
+
+"" to open URLs with gx mapping
+func! s:open_url()
+    " by default check WORD under cursor
+    let word = expand("<cWORD>")
+
+    " But if cursor is surrounded by [   ], like for http://ya.ru[yandex search]
+    " take a cWORD from first char before [
+    let save_cursor = getcurpos()
+    let line = getline('.')
+    if searchpair('\[', '', '\]', 'b', '', line('.')) 
+        let word = expand("<cWORD>")
+    endif
+    call setpos('.', save_cursor)
+
+    " Check asciidoc URL http://bla-bla.com[desc
+    let aURL = matchstr(word, '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S\+\ze\[')
+    if aURL != ""
+        exe g:asciidoctor_opener . ' ' . escape(aURL, '#%!')
+        return
+    endif
+
+    " Check asciidoc link link:file.txt[desc
+    let aLNK = matchstr(word, 'link:/*\zs\S\+\ze\[')
+    if aLNK != ""
+        execute "lcd ". expand("%:p:h")
+        exe g:asciidoctor_opener . ' ' . fnameescape(fnamemodify(aLNK, ":p"))
+        lcd -
+        return
+    endif
+
+    " Check asciidoc URL http://bla-bla.com
+    let URL = matchstr(word, '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S\+')
+    if URL != ""
+        exe g:asciidoctor_opener . ' ' . escape(URL, '#%!')
+        return
+    endif
+
+    " probably path?
+    if word =~ '^[~.$].*'
+        exe g:asciidoctor_opener . ' ' . expand(word)
+        return
+    endif
+endfunc
+
+
 "" Next/Previous section mappings
-func! s:section(back, cnt)
+fun! s:section(back, cnt)
   for n in range(a:cnt)
     call search('^=\+\s\+\S\+\|\_^\%(\n\|\%^\)\@<=\k.*\n\%(==\+\|\-\-\+\|\~\~\+\|\^\^\+\|++\+\)$', a:back ? 'bW' : 'W')
   endfor
-endfunc
+endfun

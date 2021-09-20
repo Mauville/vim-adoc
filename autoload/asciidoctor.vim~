@@ -16,7 +16,7 @@ endfunc
 
 "" Return name of an image directory.
 "
-" It is either
+" It is either 
 " * '' (empty)
 " * or value of :imagesdir: (stated at the top of the buffer, first 50 lines)
 func! s:asciidoctorImagesDir()
@@ -52,8 +52,8 @@ endfunc
 "" Return index of the image file name
 "
 " `img_document_23.png` --> 23
-" `img_document.png` --> 0
-" `any other` --> 0
+" `img_document.png` --> 0 
+" `any other` --> 0 
 func! s:asciidoctorExtractIndex(filename)
     let rxpattern = '\V\[\\/]'.printf(g:asciidoctor_img_paste_pattern, expand('%:t:r'), '\zs\d\+\ze').'\$'
     let index = matchstr(a:filename, rxpattern)
@@ -72,7 +72,7 @@ endfunc
 " Generate a new image name:
 " `img_document_3.png
 func! s:asciidoctorGenerateImageName(path)
-    let index = max(map(s:asciidoctorListImages(a:path),
+    let index = max(map(s:asciidoctorListImages(a:path), 
                 \{k,v -> s:asciidoctorExtractIndex(v)})) + 1
     return printf(g:asciidoctor_img_paste_pattern, expand('%:t:r'), index)
 endfunc
